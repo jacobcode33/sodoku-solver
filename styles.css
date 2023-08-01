@@ -29,28 +29,38 @@ h1{
 }
 
 .grid{
-    width: 284.4px; /*31.6*9*/
+    width: 464.4px; /*31.6*9*/
     margin: auto;
 }
 
+#grid2{
+    position: absolute;
+    top:122px;
+    transform: translate(-50%, 0);
+    left:50%;
+    z-index: -1;
+}
+
 .options{
-    word-break: break-word;
-    text-align: center !important;
+    text-align: center;
+    padding-left: 8px !important;;
+    padding-right: 8px !important;;
     font-size: 8pt;
-    position:static;
-    display: inline-flex;
-    width: 31.6px;
-    height: 31.6px;
+    vertical-align: middle;
+    display: inline-block;
+    width: 35.6px;
+    height: 51.6px;
     padding: 0;
-    border: none;
+    color: darkgray;
+    background-color: white;
 }
 
 .cell{
     padding: 0;
+    background-color: transparent;
     border: none;
-    width: 30px;
-    height: 30px;
-    background-color:white;
+    width: 50px;
+    height: 50px;
     color: black;
     border-radius: 0%;
     border-color: black;
