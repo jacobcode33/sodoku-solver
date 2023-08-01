@@ -25,7 +25,7 @@ for (let i = 0; i < 81; i++) {
 
     cell.cellindex = i
     cell.classList.add("options");
-    cell.textContent = "all"
+    cell.textContent = ""
     grid2.appendChild(cell);
 }
 
@@ -90,12 +90,13 @@ function solve(){
 
         for (let i = 0; i < 81; i++) {
             if (! Number.isNaN(values[i])){ // if theres a number there
-                console.log(i)
                 for (let o = 0; o < 81; o++) {
                     if (getrow(i)==getrow(o) || getcol(i)==getcol(o) || getzone(i)==getzone(o)){
                         possibles[o].splice(possibles[o].indexOf(values[i]),1)
                         if (possibles[o].length == 0){return false}
-                        children2[o].textContent = possibles[o];
+                        var hold = possibles[o].join(' ');
+                        console.log(hold)
+                        children2[o].textContent = hold;
                     }
                 }
             }

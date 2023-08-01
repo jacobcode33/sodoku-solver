@@ -35,7 +35,7 @@ h1{
 
 .options{
     word-break: break-word;
-    text-align: center;
+    text-align: center !important;
     font-size: 8pt;
     position:static;
     display: inline-flex;
