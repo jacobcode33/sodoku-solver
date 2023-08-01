@@ -51,7 +51,6 @@ function checknew(which, newindex, newvalue){
     newvalue = parseInt(newvalue)
     
     if (Number.isNaN(newvalue)){
-        console.log("yeah")
         which.classList.remove("invalid")
         which.classList.remove("known")
     }
@@ -81,8 +80,8 @@ function solve(){
         values.push(parseInt(children1[i].value))
     }
 
-    // function to produce the list of possibles
-    function limitoptions(values, possibles){
+    // function to reduce the list of possibles based on what can be played in the next move
+    function limitoptions(){
         var possibles = [] // initially set posibilities as any 
         for (let i = 0; i < 81; i++) {
             possibles.push([1,2,3,4,5,6,7,8,9])
@@ -90,23 +89,42 @@ function solve(){
 
         for (let i = 0; i < 81; i++) {
             if (! Number.isNaN(values[i])){ // if theres a number there
+                possibles[i] = [values[i]]
+                children2[i].textContent = values[i]
                 for (let o = 0; o < 81; o++) {
-                    if (getrow(i)==getrow(o) || getcol(i)==getcol(o) || getzone(i)==getzone(o)){
-                        possibles[o].splice(possibles[o].indexOf(values[i]),1)
-                        if (possibles[o].length == 0){return false}
-                        var hold = possibles[o].join(' ');
-                        console.log(hold)
+                    if (i!=o && (getrow(i)==getrow(o) || getcol(i)==getcol(o) || getzone(i)==getzone(o))){
+                        if (possibles[o].includes(values[i])) {possibles[o].splice(possibles[o].indexOf(values[i]),1)}
+                        if (possibles[o].length == 0){alert("impossible")}
+                        var hold = (possibles[o].join(' '));
                         children2[o].textContent = hold;
                     }
                 }
             }
         }
-        return true
+        return possibles
     }
 
-    limitoptions(values)
+    // if theres only n of the set length n, we can get rid of all other possibilities
+    function limitgroups(possibles){
+        function isSubset(a, b) {return a.some(item => b.includes(item));} // Function to return whether an array is a subset of another
 
-    function recurse(){
+        var group = possibles.slice(0,9) // get first line
+        test = [1,2]
 
+        haveSubset = []
+        for (let i = 0; i < 9; i++) {
+            if (isSubset(test,group[i])){
+                haveSubset.push(i)
+            }
+        }
+        if (haveSubset.length == test.length){
+            for (let i = 0; i < test.length; i++) {
+                possibles[haveSubset[i]] = test;
+                children2[haveSubset[i]].textContent = test;
+            }
+        }
     }
+
+    var possibles = limitoptions()
+    limitgroups(possibles)
 }
