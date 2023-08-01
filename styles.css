@@ -1,0 +1,38 @@
+body {background-color:antiquewhite}
+
+/*Remove arrows on inputs*/
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+
+
+#grid{
+    width: 284.4px /*31.6*9*/
+}
+
+.cell{
+    padding: 0;
+    border: none;
+    width: 30px;
+    height: 30px;
+    background-color:white;
+    color: black;
+    border-radius: 0%;
+    border-color: black;
+    border-style: solid;
+    border-width: 1pt;
+    text-align: center;
+}
+
+.cell:focus{
+    background-color: lightgrey;
+}
+
+.valid{
+    background-color: lightgreen !important;
+}
+
+.invalid{
+    background-color: palevioletred !important;
+}
