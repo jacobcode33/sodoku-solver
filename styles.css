@@ -21,15 +21,28 @@ h1{
     border-radius: 20px;
     padding: 10px;
     margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 #solve_button:active{
     background-color: rgb(176, 254, 8);
 }
 
-#grid{
+.grid{
     width: 284.4px; /*31.6*9*/
     margin: auto;
+}
+
+.options{
+    word-break: break-word;
+    text-align: center;
+    font-size: 8pt;
+    position:static;
+    display: inline-flex;
+    width: 31.6px;
+    height: 31.6px;
+    padding: 0;
+    border: none;
 }
 
 .cell{
@@ -50,7 +63,7 @@ h1{
     background-color: lightgrey;
 }
 
-.valid{
+.known{
     background-color: lightgreen !important;
 }
 

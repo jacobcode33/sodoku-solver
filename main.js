@@ -5,17 +5,28 @@ function getzone(index){return (3*Math.floor(getrow(index)/3) + Math.floor(getco
 
 
 
-//create grid
+//create grid 1
 const grid = document.getElementById("grid");
 
 for (let i = 0; i < 81; i++) {
 	var cell = document.createElement("INPUT");
-    //cell.id = "cell"+i
+
     cell.cellindex = i
     cell.classList.add("cell")
     cell.type = "number";
     cell.onkeyup = function() {checknew(this,this.cellindex,this.value)};
     grid.appendChild(cell);
+}
+
+//create grid2
+const grid2 = document.getElementById("grid2")
+for (let i = 0; i < 81; i++) {
+	var cell = document.createElement("div");
+
+    cell.cellindex = i
+    cell.classList.add("options");
+    cell.textContent = "all"
+    grid2.appendChild(cell);
 }
 
 // returns boolean of whether placing here is a legal move
@@ -42,7 +53,7 @@ function checknew(which, newindex, newvalue){
     if (Number.isNaN(newvalue)){
         console.log("yeah")
         which.classList.remove("invalid")
-        which.classList.remove("valid")
+        which.classList.remove("known")
     }
 
     else if (!(Number.isInteger(newvalue) && 0<=newvalue && newvalue<=9)){ // If they arent a number or are out of range it is invalid
@@ -50,7 +61,51 @@ function checknew(which, newindex, newvalue){
     }
 
     else{ // value can now be checked for legal position
-        if (checkposition(newindex, newvalue)){which.classList.add("valid")}
+        if (checkposition(newindex, newvalue)){which.classList.add("known")}
         else {which.classList.add("invalid")}
+    }
+}
+
+
+
+
+
+
+function solve(){
+    var children1 = grid.children
+    var children2 = grid2.children
+
+    // get initial values
+    var values = []
+    for (let i = 0; i < 81; i++) {
+        values.push(parseInt(children1[i].value))
+    }
+
+    // function to produce the list of possibles
+    function limitoptions(values, possibles){
+        var possibles = [] // initially set posibilities as any 
+        for (let i = 0; i < 81; i++) {
+            possibles.push([1,2,3,4,5,6,7,8,9])
+        }
+
+        for (let i = 0; i < 81; i++) {
+            if (! Number.isNaN(values[i])){ // if theres a number there
+                console.log(i)
+                for (let o = 0; o < 81; o++) {
+                    if (getrow(i)==getrow(o) || getcol(i)==getcol(o) || getzone(i)==getzone(o)){
+                        possibles[o].splice(possibles[o].indexOf(values[i]),1)
+                        if (possibles[o].length == 0){return false}
+                        children2[o].textContent = possibles[o];
+                    }
+                }
+            }
+        }
+        return true
+    }
+
+    limitoptions(values)
+
+    function recurse(){
+
     }
 }
