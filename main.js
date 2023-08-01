@@ -107,20 +107,70 @@ function solve(){
     // if theres only n of the set length n, we can get rid of all other possibilities
     function limitgroups(possibles){
         function isSubset(a, b) {return a.some(item => b.includes(item));} // Function to return whether an array is a subset of another
+        function getgroups(){ // Function to create list of groups
+            const groups = [ // writing this out is more time effective than creating a function
+            [0,1,2,9,10,11,18,19,20],
+            [3,4,5,12,13,14,21,22,23],
+            [6,7,8,15,16,17,24,25,26],
+            [27,28,29,36,37,38,45,46,47],
+            [30,31,32,39,40,41,48,49,50],
+            [33,34,35,42,43,44,51,52,53],
+            [54,55,56,63,64,65,72,73,74],
+            [57,58,59,66,67,68,75,76,77],
+            [60,61,62,69,70,71,78,79,80]] //zones
 
-        var group = possibles.slice(0,9) // get first line
-        test = [1,2]
-
-        haveSubset = []
-        for (let i = 0; i < 9; i++) {
-            if (isSubset(test,group[i])){
-                haveSubset.push(i)
+            for (let i = 0; i < 9; i++) { //add all rows
+                var hold = []
+                for (let o = 0; o < 9; o++) {hold.push(i*9+o)}
+                groups.push(hold)
             }
+            for (let i = 0; i < 9; i++) { //add all columns
+                var hold = []
+                for (let o = 0; o < 9; o++) {hold.push(i+o*9)}
+                groups.push(hold)
+            }
+            return groups
         }
-        if (haveSubset.length == test.length){
-            for (let i = 0; i < test.length; i++) {
-                possibles[haveSubset[i]] = test;
-                children2[haveSubset[i]].textContent = test;
+        function gettests(maxLength) { // Function to create list of test arrays
+            const inputArray = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+            const result = [];
+          
+            function backtrack(startIndex, currentCombination) {
+              if (currentCombination.length <= maxLength) {
+                result.push([...currentCombination]);
+              }
+
+              for (let i = startIndex; i < inputArray.length; i++) {
+                currentCombination.push(inputArray[i]);
+                backtrack(i + 1, currentCombination);
+                currentCombination.pop();
+              }
+            }
+          
+            backtrack(0, []);
+            return result;
+          }
+
+        groups = getgroups()
+        tests = gettests(3)
+        console.log(tests)
+
+        for (let group = 0; group < groups.length; group++) {
+            test = [1,2]
+
+            haveSubset = []
+            for (let i = 0; i < 9; i++) {
+                if (isSubset(test,possibles[groups[group][i]])){
+                    haveSubset.push(groups[group][i])
+                }
+            }
+            if (haveSubset.length == test.length){
+                for (let i = 0; i < test.length; i++) {
+                    if (possibles[haveSubset[i]].length != 1) {
+                        possibles[haveSubset[i]] = test;
+                        children2[haveSubset[i]].textContent = test;
+                    }
+                }
             }
         }
     }
