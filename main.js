@@ -19,7 +19,7 @@ for (let i = 0; i < 81; i++) {
 }
 
 // returns boolean of whether placing here is a legal move
-function checkposition(newindex, newvalue, fill){
+function checkposition(newindex, newvalue){
     var thisrow = getrow(newindex)
     var thiscol = getcol(newindex)
     var thiszone = getzone(newindex);
@@ -35,6 +35,7 @@ function checkposition(newindex, newvalue, fill){
     return true
 }
 
+// function to check whether a human entered value is valid and colours it appropriately
 function checknew(which, newindex, newvalue){
     newvalue = parseInt(newvalue)
     
@@ -49,7 +50,7 @@ function checknew(which, newindex, newvalue){
     }
 
     else{ // value can now be checked for legal position
-        if (checkposition(newindex, newvalue, true)){which.classList.add("valid")}
+        if (checkposition(newindex, newvalue)){which.classList.add("valid")}
         else {which.classList.add("invalid")}
     }
 }

@@ -6,9 +6,30 @@ input::-webkit-inner-spin-button {
     -webkit-appearance: none;
 }
 
+h1{
+    padding: 20px;
+    text-align: center;
+    font-family: "Verdana";
+}
+
+#solve_button{
+    position: relative;
+    transform: translate(-50%, 0);
+    left: 50%;
+    background-color: yellow;
+    border-color: black;
+    border-radius: 20px;
+    padding: 10px;
+    margin-top: 20px;
+}
+
+#solve_button:active{
+    background-color: rgb(176, 254, 8);
+}
 
 #grid{
-    width: 284.4px /*31.6*9*/
+    width: 284.4px; /*31.6*9*/
+    margin: auto;
 }
 
 .cell{
