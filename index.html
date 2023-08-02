@@ -10,7 +10,12 @@
     <h1>Sudoku Solver</h1>
     <div class="grid" id="grid2"></div>
     <div class="grid" id="grid"></div>
-    <button id="solve_button" onclick="solve()">Solve it!</button>
+    <div id="buttons">
+        <button class="button" id="clear_button" onclick="clearAll()">Clear all</button>
+        <button class="button" id="solve_button" onclick="solve()">Solve it!</button>
+        <button class="button" id="reset_button" onclick="reset()">Reset sudoku</button>
+        <button class="button" id="check_button" onclick="justCheck()">Check</button>
+    </div>
 
     <script src="main.js"></script>
 </body>

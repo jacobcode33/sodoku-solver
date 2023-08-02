@@ -12,19 +12,24 @@ h1{
     font-family: "Verdana";
 }
 
-#solve_button{
+#buttons{
     position: relative;
+    width: 428px;
     transform: translate(-50%, 0);
     left: 50%;
+}
+
+.button{
     background-color: yellow;
     border-color: black;
+    width:140px;
     border-radius: 20px;
     padding: 10px;
     margin-top: 20px;
     margin-bottom: 20px;
 }
 
-#solve_button:active{
+.button:active{
     background-color: rgb(176, 254, 8);
 }
 
@@ -83,4 +88,8 @@ h1{
 
 .invalid{
     background-color: palevioletred !important;
+}
+
+.guess{
+    background-color: rgb(241, 163, 61);
 }
