@@ -69,10 +69,16 @@ function checknew(which, newindex, newvalue){
 
 
 
+function update_possibles(possibles){
+    var children2 = grid2.children
+    for (let i = 0; i < 81; i++) {
+        children2[i].textContent= (possibles[i].join(' '));
+    }
+}
+
 
 function solve(){
     var children1 = grid.children
-    var children2 = grid2.children
 
     // get initial values
     var values = []
@@ -90,13 +96,10 @@ function solve(){
         for (let i = 0; i < 81; i++) {
             if (! Number.isNaN(values[i])){ // if theres a number there
                 possibles[i] = [values[i]]
-                children2[i].textContent = values[i]
                 for (let o = 0; o < 81; o++) {
                     if (i!=o && (getrow(i)==getrow(o) || getcol(i)==getcol(o) || getzone(i)==getzone(o))){
                         if (possibles[o].includes(values[i])) {possibles[o].splice(possibles[o].indexOf(values[i]),1)}
                         if (possibles[o].length == 0){alert("impossible")}
-                        var hold = (possibles[o].join(' '));
-                        children2[o].textContent = hold;
                     }
                 }
             }
@@ -106,7 +109,8 @@ function solve(){
 
     // if theres only n of the set length n, we can get rid of all other possibilities
     function limitgroups(possibles){
-        function isSubset(a, b) {return a.some(item => b.includes(item));} // Function to return whether an array is a subset of another
+        function isSubset(a, b) {
+            return a.some(item => b.includes(item));} // Function to return whether an array is a subset of another
         function getgroups(){ // Function to create list of groups
             const groups = [ // writing this out is more time effective than creating a function
             [0,1,2,9,10,11,18,19,20],
@@ -153,28 +157,34 @@ function solve(){
 
         groups = getgroups()
         tests = gettests(3)
-        console.log(tests)
+        tests.shift()
 
-        for (let group = 0; group < groups.length; group++) {
-            test = [1,2]
+        for (let gcount = 0; gcount < groups.length; gcount++) {
+            for (let tcount = 0; tcount < tests.length; tcount++) {
+                group = groups[gcount]
+                test = tests[tcount]
 
-            haveSubset = []
-            for (let i = 0; i < 9; i++) {
-                if (isSubset(test,possibles[groups[group][i]])){
-                    haveSubset.push(groups[group][i])
+                haveSubset = []
+                for (let i = 0; i < 9; i++) {
+                    if (isSubset(test,possibles[group[i]])){
+                        haveSubset.push(group[i])
+                    }
                 }
-            }
-            if (haveSubset.length == test.length){
-                for (let i = 0; i < test.length; i++) {
-                    if (possibles[haveSubset[i]].length != 1) {
-                        possibles[haveSubset[i]] = test;
-                        children2[haveSubset[i]].textContent = test;
+                if (haveSubset.length == test.length){ // if this is the only way it can be
+                    for (let i = 0; i < test.length; i++) { // for each involved cell
+                        for (let o = 0; o < test.length; o++) { // for each number concerned
+                            if (possibles[haveSubset[i]].length != 1) {
+                                possibles[haveSubset[i]] = test
+                            }
+                        }
                     }
                 }
             }
         }
+        return possibles
     }
 
     var possibles = limitoptions()
-    limitgroups(possibles)
+    possibles = limitgroups(possibles)
+    update_possibles(possibles)
 }
