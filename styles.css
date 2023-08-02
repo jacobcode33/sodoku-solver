@@ -77,6 +77,10 @@ h1{
     background-color: lightgreen !important;
 }
 
+.found{
+    background-color: rgb(212, 241, 138) !important;
+}
+
 .invalid{
     background-color: palevioletred !important;
 }

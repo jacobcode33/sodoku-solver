@@ -71,28 +71,43 @@ function checknew(which, newindex, newvalue){
 
 function update_possibles(possibles){
     var children2 = grid2.children
+    var children1 = grid.children
     for (let i = 0; i < 81; i++) {
-        children2[i].textContent= (possibles[i].join(' '));
+        if (possibles[i].length == 1 && ! children1[i].classList.contains("known")){ // if theres only one option fill it in as found
+            children1[i].value = possibles[i][0]
+            children1[i].classList.add("found")
+            }
+        children2[i].textContent = (possibles[i].join(' '));
     }
 }
 
 
-function solve(){
+async function delay(amount) {
+    await new Promise((resolve) => setTimeout(resolve, amount));
+    console.log("One second has passed!");
+  }
+
+async function solve(){
     var children1 = grid.children
 
-    // get initial values
-    var values = []
-    for (let i = 0; i < 81; i++) {
-        values.push(parseInt(children1[i].value))
+    function getvalues(){ // get initial values
+        var values = []
+        for (let i = 0; i < 81; i++) {
+            values.push(parseInt(children1[i].value))
+        }
+        return values
     }
 
-    // function to reduce the list of possibles based on what can be played in the next move
-    function limitoptions(){
+    function createpossibles(){
         var possibles = [] // initially set posibilities as any 
         for (let i = 0; i < 81; i++) {
             possibles.push([1,2,3,4,5,6,7,8,9])
         }
+        return possibles
+    }
 
+    // function to reduce the list of possibles based on what can be played in the next move
+    function limitoptions(values, possibles){
         for (let i = 0; i < 81; i++) {
             if (! Number.isNaN(values[i])){ // if theres a number there
                 possibles[i] = [values[i]]
@@ -156,7 +171,7 @@ function solve(){
           }
 
         groups = getgroups()
-        tests = gettests(3)
+        tests = gettests(6)
         tests.shift()
 
         for (let gcount = 0; gcount < groups.length; gcount++) {
@@ -184,7 +199,14 @@ function solve(){
         return possibles
     }
 
-    var possibles = limitoptions()
-    possibles = limitgroups(possibles)
+    
+
+    var values = getvalues()
+    var possibles = createpossibles()
+    possibles = limitoptions(values,possibles)
+    for (let cycle = 0; cycle < 10; cycle++) {
+        possibles = limitgroups(possibles)
+    }
     update_possibles(possibles)
+    values = getvalues()
 }
