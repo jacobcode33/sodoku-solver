@@ -53,6 +53,7 @@ function checknew(which, newindex, newvalue){
     if (Number.isNaN(newvalue)){
         which.classList.remove("invalid")
         which.classList.remove("known")
+        which.classList.remove("found")
     }
 
     else if (!(Number.isInteger(newvalue) && 0<=newvalue && newvalue<=9)){ // If they arent a number or are out of range it is invalid
@@ -65,148 +66,192 @@ function checknew(which, newindex, newvalue){
     }
 }
 
-
-
-
-
-function update_possibles(possibles){
-    var children2 = grid2.children
-    var children1 = grid.children
+function clearAll(){
     for (let i = 0; i < 81; i++) {
-        if (possibles[i].length == 1 && ! children1[i].classList.contains("known")){ // if theres only one option fill it in as found
-            children1[i].value = possibles[i][0]
-            children1[i].classList.add("found")
-            }
-        children2[i].textContent = (possibles[i].join(' '));
+        grid2.children[i].textContent = ""
+        grid.children[i].value = ""
+        grid.children[i].classList = ["cell"]
+    }
+}
+
+function reset(){
+    for (let i = 0; i < 81; i++) {
+        grid2.children[i].textContent = ""
+        if (! grid.children[i].classList.contains("known")) {
+            grid.children[i].value = ""
+            grid.children[i].classList = ["cell"]
+        }
     }
 }
 
 
+
+
 async function delay(amount) {
     await new Promise((resolve) => setTimeout(resolve, amount));
-    console.log("One second has passed!");
   }
 
+function update_possibles(possibles){ // Function to draw possibilities to the screen and return how many are unsolved
+    var remaining = 81
+    for (let i = 0; i < 81; i++) {
+        if (possibles[i].length == 0){return -1} // if it has no possible placements return the terminating value
+
+        if (possibles[i].length == 1 && ! (grid.children[i].classList.contains("known") || grid.children[i].classList.contains("guess"))){ // if theres only one option fill it in as found
+            grid.children[i].value = possibles[i][0]
+            grid.children[i].classList.add("found")
+            }
+        else if (possibles[i].length != 1) { // if theres multiple possibilities
+            grid.children[i].value = ""
+            grid.children[i].classList.remove("found")
+            remaining -= 1
+        }
+        grid2.children[i].textContent = (possibles[i].join(' '));
+    }
+    return remaining
+}
+
+function getvalues(){ // get initial values
+    var values = []
+    for (let i = 0; i < 81; i++) {
+        values.push(parseInt(grid.children[i].value))
+    }
+    return values
+}
+
+function createpossibles(){
+    var possibles = [] // initially set posibilities as any 
+    for (let i = 0; i < 81; i++) {
+        possibles.push([1,2,3,4,5,6,7,8,9])
+    }
+    return possibles
+}
+
+// function to reduce the list of possibles based on what can be played in the next move
+function limitoptions(values, possibles){
+    for (let i = 0; i < 81; i++) {
+        if (! Number.isNaN(values[i])){ // if theres a number there
+            possibles[i] = [values[i]]
+            for (let o = 0; o < 81; o++) {
+                if (i!=o && (getrow(i)==getrow(o) || getcol(i)==getcol(o) || getzone(i)==getzone(o))){
+                    if (possibles[o].includes(values[i])) {possibles[o].splice(possibles[o].indexOf(values[i]),1)}
+                }
+            }
+        }
+    }
+    return possibles
+}
+
+// if theres only n of the set length n, we can get rid of all other possibilities
+function limitgroups(possibles){
+    function isSubset(a, b) { // note that this is technically not for subsets
+        if (a.length > b.length) {return true} // fixes increasing the possibilities unintentionally
+        return a.some(item => b.includes(item));} // Function to return whether an array is a subset of another
+    function getgroups(){ // Function to create list of groups
+        const groups = [ // writing this out is more time effective than creating a function
+        [0,1,2,9,10,11,18,19,20],
+        [3,4,5,12,13,14,21,22,23],
+        [6,7,8,15,16,17,24,25,26],
+        [27,28,29,36,37,38,45,46,47],
+        [30,31,32,39,40,41,48,49,50],
+        [33,34,35,42,43,44,51,52,53],
+        [54,55,56,63,64,65,72,73,74],
+        [57,58,59,66,67,68,75,76,77],
+        [60,61,62,69,70,71,78,79,80]] //zones
+
+        for (let i = 0; i < 9; i++) { //add all rows
+            var hold = []
+            for (let o = 0; o < 9; o++) {hold.push(i*9+o)}
+            groups.push(hold)
+        }
+        for (let i = 0; i < 9; i++) { //add all columns
+            var hold = []
+            for (let o = 0; o < 9; o++) {hold.push(i+o*9)}
+            groups.push(hold)
+        }
+        return groups
+    }
+    function gettests(maxLength) { // Function to create list of test arrays
+        const inputArray = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+        const result = [];
+        
+        function backtrack(startIndex, currentCombination) {
+            if (currentCombination.length <= maxLength) {
+            result.push([...currentCombination]);
+            }
+
+            for (let i = startIndex; i < inputArray.length; i++) {
+            currentCombination.push(inputArray[i]);
+            backtrack(i + 1, currentCombination);
+            currentCombination.pop();
+            }
+        }
+        
+        backtrack(0, []);
+        return result;
+        }
+
+    groups = getgroups()
+    tests = gettests(6)
+    tests.shift()
+
+    for (let gcount = 0; gcount < groups.length; gcount++) {
+        for (let tcount = 0; tcount < tests.length; tcount++) {
+            group = groups[gcount]
+            test = tests[tcount]
+
+            haveSubset = []
+            for (let i = 0; i < 9; i++) {
+                if (isSubset(test,possibles[group[i]])){
+                    haveSubset.push(group[i])
+                }
+            }
+            if (haveSubset.length == test.length){ // if this is the only way it can be
+                for (let i = 0; i < test.length; i++) { // for each involved cell
+                    if (possibles[haveSubset[i]].length != 1) {
+                        possibles[haveSubset[i]] = test
+                    }
+                }
+            }
+        }
+    }
+    return possibles
+}
+
 async function solve(){
-    var children1 = grid.children
-
-    function getvalues(){ // get initial values
-        var values = []
-        for (let i = 0; i < 81; i++) {
-            values.push(parseInt(children1[i].value))
-        }
-        return values
+    var last = 82
+    var remaining = 81
+    while (last != remaining && remaining != -1) {
+        await delay(100)
+        last = remaining
+        var values = getvalues()
+        var possibles = createpossibles()
+        possibles = limitoptions(values,possibles) // reduces possible moves based on what can be legally placed
+        remaining = update_possibles(possibles) // displays possible moves and finds if it has been complete
+        await delay(100)
+        possibles = limitgroups(possibles) // reduces possible moves as we know that if only n spots can take n numbers, they must appear here
+        remaining = update_possibles(possibles) // displays possible moves and finds if it has been complete
     }
 
-    function createpossibles(){
-        var possibles = [] // initially set posibilities as any 
-        for (let i = 0; i < 81; i++) {
-            possibles.push([1,2,3,4,5,6,7,8,9])
-        }
-        return possibles
-    }
-
-    // function to reduce the list of possibles based on what can be played in the next move
-    function limitoptions(values, possibles){
-        for (let i = 0; i < 81; i++) {
-            if (! Number.isNaN(values[i])){ // if theres a number there
-                possibles[i] = [values[i]]
-                for (let o = 0; o < 81; o++) {
-                    if (i!=o && (getrow(i)==getrow(o) || getcol(i)==getcol(o) || getzone(i)==getzone(o))){
-                        if (possibles[o].includes(values[i])) {possibles[o].splice(possibles[o].indexOf(values[i]),1)}
-                        if (possibles[o].length == 0){alert("impossible")}
-                    }
+    if (remaining > 0) { // if there wasn't enough info to determine the solution
+        for (let i = 0; i < 81; i++) { // for all the cells
+            if (possibles[i].length > 1) { // if its not known
+                for (let o = 0; o < possibles[i].length; o++) { // for all the things it could be
+                    await delay(100)
+                    grid.children[i].value = possibles[i][o]
+                    grid.children[i].classList.add("guess")
+                    await delay(100)
+                    solve()
+                    grid.children[i].value = ""
+                    grid.children[i].classList.remove("guess")
                 }
             }
         }
-        return possibles
-    }
+    } 
+}
 
-    // if theres only n of the set length n, we can get rid of all other possibilities
-    function limitgroups(possibles){
-        function isSubset(a, b) {
-            return a.some(item => b.includes(item));} // Function to return whether an array is a subset of another
-        function getgroups(){ // Function to create list of groups
-            const groups = [ // writing this out is more time effective than creating a function
-            [0,1,2,9,10,11,18,19,20],
-            [3,4,5,12,13,14,21,22,23],
-            [6,7,8,15,16,17,24,25,26],
-            [27,28,29,36,37,38,45,46,47],
-            [30,31,32,39,40,41,48,49,50],
-            [33,34,35,42,43,44,51,52,53],
-            [54,55,56,63,64,65,72,73,74],
-            [57,58,59,66,67,68,75,76,77],
-            [60,61,62,69,70,71,78,79,80]] //zones
-
-            for (let i = 0; i < 9; i++) { //add all rows
-                var hold = []
-                for (let o = 0; o < 9; o++) {hold.push(i*9+o)}
-                groups.push(hold)
-            }
-            for (let i = 0; i < 9; i++) { //add all columns
-                var hold = []
-                for (let o = 0; o < 9; o++) {hold.push(i+o*9)}
-                groups.push(hold)
-            }
-            return groups
-        }
-        function gettests(maxLength) { // Function to create list of test arrays
-            const inputArray = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-            const result = [];
-          
-            function backtrack(startIndex, currentCombination) {
-              if (currentCombination.length <= maxLength) {
-                result.push([...currentCombination]);
-              }
-
-              for (let i = startIndex; i < inputArray.length; i++) {
-                currentCombination.push(inputArray[i]);
-                backtrack(i + 1, currentCombination);
-                currentCombination.pop();
-              }
-            }
-          
-            backtrack(0, []);
-            return result;
-          }
-
-        groups = getgroups()
-        tests = gettests(6)
-        tests.shift()
-
-        for (let gcount = 0; gcount < groups.length; gcount++) {
-            for (let tcount = 0; tcount < tests.length; tcount++) {
-                group = groups[gcount]
-                test = tests[tcount]
-
-                haveSubset = []
-                for (let i = 0; i < 9; i++) {
-                    if (isSubset(test,possibles[group[i]])){
-                        haveSubset.push(group[i])
-                    }
-                }
-                if (haveSubset.length == test.length){ // if this is the only way it can be
-                    for (let i = 0; i < test.length; i++) { // for each involved cell
-                        for (let o = 0; o < test.length; o++) { // for each number concerned
-                            if (possibles[haveSubset[i]].length != 1) {
-                                possibles[haveSubset[i]] = test
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return possibles
-    }
-
-    
-
+function justCheck(){
     var values = getvalues()
-    var possibles = createpossibles()
-    possibles = limitoptions(values,possibles)
-    for (let cycle = 0; cycle < 10; cycle++) {
-        possibles = limitgroups(possibles)
-    }
+    var possibles = createpossibles() 
+    limitoptions(values,possibles)
     update_possibles(possibles)
-    values = getvalues()
 }
