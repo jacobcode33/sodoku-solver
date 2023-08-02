@@ -91,18 +91,23 @@ async function delay(amount) {
     await new Promise((resolve) => setTimeout(resolve, amount));
   }
 
-function update_possibles(possibles){ // Function to draw possibilities to the screen and return how many are unsolved
+function update_possibles(possibles, safe=false){ // Function to draw possibilities to the screen and return how many are unsolved
     var remaining = 81
     for (let i = 0; i < 81; i++) {
+        if (possibles == false){return -1} // if its been declared impossible by another function
         if (possibles[i].length == 0){return -1} // if it has no possible placements return the terminating value
 
         if (possibles[i].length == 1 && ! (grid.children[i].classList.contains("known") || grid.children[i].classList.contains("guess"))){ // if theres only one option fill it in as found
-            grid.children[i].value = possibles[i][0]
-            grid.children[i].classList.add("found")
+            if (!safe){ // if theres a chance this is an illegal assumption
+
+                grid.children[i].value = possibles[i][0]
+                grid.children[i].classList.add("found")
+                }
             }
         else if (possibles[i].length != 1) { // if theres multiple possibilities
             grid.children[i].value = ""
             grid.children[i].classList.remove("found")
+            grid.children[i].classList.remove("guess")
             remaining -= 1
         }
         grid2.children[i].textContent = (possibles[i].join(' '));
@@ -212,6 +217,7 @@ function limitgroups(possibles){
                     }
                 }
             }
+            if (haveSubset.length < test.length){return false} // if its impossible to finish
         }
     }
     return possibles
@@ -232,26 +238,64 @@ async function solve(){
         remaining = update_possibles(possibles) // displays possible moves and finds if it has been complete
     }
 
-    if (remaining > 0) { // if there wasn't enough info to determine the solution
-        for (let i = 0; i < 81; i++) { // for all the cells
-            if (possibles[i].length > 1) { // if its not known
-                for (let o = 0; o < possibles[i].length; o++) { // for all the things it could be
-                    await delay(100)
-                    grid.children[i].value = possibles[i][o]
-                    grid.children[i].classList.add("guess")
-                    await delay(100)
-                    solve()
-                    grid.children[i].value = ""
-                    grid.children[i].classList.remove("guess")
-                }
-            }
+    if (remaining == -1){return}
+
+    //if (remaining > 0) {return} // if there wasn't enough info to determine the solution
+}
+
+function resetValues(guesses){ // function to reset the values back to what it was before this recursive call
+    for (let i = 0; i < guesses.length; i++) {
+        grid.children[guesses[i]].value = ""
+        //grid.children[guesses[i]].classList = ["cell"]
+    }
+}
+
+async function pressGuess(){
+    var count = 0
+    success = false
+    while (count<1000 && !success){
+        var [guesses, success] = guess()
+        await delay(5)
+        resetValues(guesses)
+        console.log(success)
+        count += 1
+    }
+}
+
+function guess(){
+    var guesses = []
+    var values = getvalues()
+    var possibles = createpossibles()
+    possibles = limitoptions(values, possibles)
+    var remaining = update_possibles(possibles)
+
+    while (remaining != -1 && remaining != 81) { // for all unknown cells
+        var i = Math.floor(Math.random() * 80)
+        while (grid.children[i].value != "") {
+            i+=1;
+            if (i>80){i=0} // if its at the end loop back around
         }
-    } 
+        
+        var value = possibles[i][Math.floor(Math.random() * possibles[i].length)]
+        if (!checkposition(i,value)){break}
+        guesses.push(i)
+        possibles[i] = [value]
+        grid.children[i].classList.add("guess")
+        grid.children[i].value = value
+        values[i] = value
+        values = getvalues()
+        possibles = limitoptions(values, possibles)
+        remaining = update_possibles(possibles, true)
+        //await delay(0)
+
+        
+    }
+    return [guesses,(remaining==81)]
 }
 
 function justCheck(){
     var values = getvalues()
-    var possibles = createpossibles() 
+    var possibles = createpossibles()
     limitoptions(values,possibles)
     update_possibles(possibles)
 }
