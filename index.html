@@ -11,11 +11,12 @@
     <div class="grid" id="grid2"></div>
     <div class="grid" id="grid"></div>
     <div id="buttons">
-        <button class="button" id="clear_button" onclick="clearAll()">Clear all</button>
-        <button class="button" id="solve_button" onclick="solve()">Solve it!</button>
-        <button class="button" id="reset_button" onclick="reset()">Reset sudoku</button>
-        <button class="button" id="check_button" onclick="justCheck()">Check</button>
-        <button class="button" id="guess_button" onclick="pressGuess()">Guess</button>
+        <button onmouseover="changetext(0)" class="button" id="clear_button" onclick="clearAll()">Clear all</button>
+        <button onmouseover="changetext(1)" class="button" id="solve_button" onclick="solve()">Solve it!</button>
+        <button onmouseover="changetext(2)" class="button" id="reset_button" onclick="reset()">Reset sudoku</button>
+        <!--<button class="button" id="check_button" onclick="justCheck()">Check</button>
+        <button class="button" id="guess_button" onclick="pressGuess()">Guess</button>-->
+    <h2 id="description">text</h2>
     </div>
 
     <script src="main.js"></script>

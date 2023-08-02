@@ -299,3 +299,12 @@ function justCheck(){
     limitoptions(values,possibles)
     update_possibles(possibles)
 }
+
+
+
+// Function to change the description when hovering over a button
+function changetext(num) {
+    textbox = document.getElementById("description")
+    texts = ["Resets entire sudoku to be reused", "Will iteratively attempt to solve the sudoku by checking if groups must contain a specific subset, this can solve most intermediate sudoku puzzles", "Returns back to the unsolved problem entered"]
+    textbox.textContent = texts[num]
+}

@@ -93,3 +93,20 @@ h1{
 .guess{
     background-color: rgb(241, 163, 61);
 }
+
+h2{
+    font-size: 12px;
+    opacity: 0%;
+    padding: 20px;
+    text-align: center;
+    font-family: "Verdana";
+    margin-top: 0px;
+    padding-top: 0px;
+    transition: 150ms;
+}
+
+
+.button:hover ~ h2{
+    opacity: 100%;
+    
+}
